@@ -5,11 +5,14 @@ class PlutoCell {
   PlutoCell({
     dynamic value,
     Key? key,
+    this.data, // edited here
   })  : _key = key ?? UniqueKey(),
         _value = value,
         _originalValue = value;
 
   final Key _key;
+
+  final data; // edited here
 
   dynamic _value;
 

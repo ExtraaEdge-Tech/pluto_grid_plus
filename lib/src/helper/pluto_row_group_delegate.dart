@@ -323,7 +323,7 @@ class PlutoRowGroupByColumnDelegate extends PlutoRowGroupDelegate {
         final row = _createRowGroup(
           groupKeys: groupKeys,
           sortIdx: ++sortIdx,
-          sampleRow: currentIter.current.value.first,
+          sampleRow: currentIter.current.value,
         );
 
         currentParent = parentStack.lastOrNull;
@@ -431,7 +431,7 @@ class PlutoRowGroupByColumnDelegate extends PlutoRowGroupDelegate {
   PlutoRow _createRowGroup({
     required List<String> groupKeys,
     required int sortIdx,
-    required PlutoRow sampleRow,
+    required List<PlutoRow> sampleRow
   }) {
     final cells = <String, PlutoCell>{};
 
@@ -446,12 +446,92 @@ class PlutoRowGroupByColumnDelegate extends PlutoRowGroupDelegate {
       ),
     );
 
-    for (var e in sampleRow.cells.entries) {
+    /// added here
+    var key;
+    var subkey1;
+    var subkey2;
+    var subkey3;
+    var subkey4;
+    var isFirst = true;
+    var isFirst1 = true;
+
+    List<Map<dynamic, dynamic>> xAxisMapList = [];
+    var yAxisMap;
+    var xAxisMap;
+    var type;
+
+    for (var a in sampleRow.first.cells.entries) {
+      final map = a.value.data;
+      type = map?['type'];
+      final _yAxisMap = map?['yAxisMap'];
+      final xAxisMap = map?['xAxisMap'];
+      if(type=='table2'){
+        xAxisMapList.add(xAxisMap);
+      }
+      if(isFirst1) {
+        yAxisMap = _yAxisMap;
+      }
+      isFirst1 = false;
+
+      print("pluto cell data is ${a.value.data}");
+    }
+
+    for (var e in sampleRow) {
+      final map = e.cells.entries.first.value.data;
+      final _key = map?['key'];
+      final _subkey1 = map?['subkey1'];
+      final _subkey2 = map?['subkey2'];
+      final _subkey3 = map?['subkey3'];
+      final _subkey4 = map?['subkey4'];
+
+      type = map?['type'];
+      final _yAxisMap = map?['yAxisMap'];
+      final xAxisMap = map?['xAxisMap'];
+      if(type=='table2'){
+        xAxisMapList.add(xAxisMap);
+      }
+
+      if(isFirst){
+        yAxisMap = _yAxisMap;
+        key = _key;
+        subkey1 = _subkey1;
+        subkey2 = _subkey2;
+        subkey3 = _subkey3;
+        subkey4 = _subkey4;
+      }
+      if(key!=_key){
+        key = null;
+      }
+      if(subkey1!=_subkey1){
+        subkey1 = null;
+      }
+      if(subkey2!=_subkey2){
+        subkey2 = null;
+      }
+      if(subkey3!=_subkey3){
+        subkey3 = null;
+      }
+      if(subkey4!=_subkey4){
+        subkey4 = null;
+      }
+      isFirst = false;
+    }
+
+    for (var e in sampleRow.first.cells.entries) {
       cells[e.key] = PlutoCell(
         value: visibleColumns.firstWhereOrNull((c) => c.field == e.key) != null
             ? e.value.value
             : null,
         key: ValueKey('${groupKey}_${e.key}_cell'),
+          data: {
+            'key': key,
+            'subkey1': subkey1,
+            'subkey2': subkey2,
+            'subkey3': subkey3,
+            'subkey4': subkey4,
+            'xAxisMap':e.value.data?['xAxisMap'],
+            'yAxisMap':e.value.data?['yAxisMap']
+          }  // edited here
       )
         ..setColumn(e.value.column)
         ..setRow(row);
@@ -459,4 +539,23 @@ class PlutoRowGroupByColumnDelegate extends PlutoRowGroupDelegate {
 
     return row;
   }
+}
+
+Map<dynamic, dynamic> findCommonKeyValues(List<Map<dynamic, dynamic>> maps) {
+  // Initialize the common key-value set with the keys and values from the first map
+  Set<dynamic> commonKeys = maps.first.keys.toSet();
+  Set<dynamic> commonValues = maps.first.values.toSet();
+  // Iterate through the remaining maps and update the common key-value sets
+  for (final map in maps.skip(1)) {
+    commonKeys = commonKeys.intersection(map.keys.toSet());
+    commonValues = commonValues.intersection(map.values.toSet());
+  }
+  // Create a new map containing the common key-value pairs
+  Map<dynamic, dynamic> commonKeyValues = {};
+  for (final key in commonKeys) {
+    if (commonValues.contains(maps.first[key])) {
+      commonKeyValues[key] = maps.first[key]!;
+    }
+  }
+  return commonKeyValues;
 }
