@@ -14,7 +14,7 @@ dependencies:
   # https://github.com/flutter/flutter/blob/84a1e904f44f9b0e9c4510138010edcc653163f8/packages/flutter_localizations/pubspec.yaml#L11
   intl: ^0.19.0
   collection: ^1.18.0
-  csv: ^5.0.1
+  csv: ^5.1.1
   pdf: ^3.8.3
   printing: ^5.9.3
   rxdart: ^0.28.0
