@@ -270,6 +270,9 @@ class PlutoRowGroupByColumnDelegate extends PlutoRowGroupDelegate {
   bool isEditableCell(PlutoCell cell) =>
       cell.row.type.isNormal && !isRowGroupColumn(cell.column);
 
+  bool isNumberType(PlutoCell cell) =>
+      cell.column.type == PlutoColumnType.number();
+
   /// {@macro pluto_row_group_delegate_isExpandableCell}
   @override
   bool isExpandableCell(PlutoCell cell) {
@@ -453,28 +456,28 @@ class PlutoRowGroupByColumnDelegate extends PlutoRowGroupDelegate {
     var subkey3;
     var subkey4;
     var isFirst = true;
-    var isFirst1 = true;
+    // var isFirst1 = true;
 
     List<Map<dynamic, dynamic>> xAxisMapList = [];
     var yAxisMap;
     var xAxisMap;
-    var type;
+    // var type;
 
-    for (var a in sampleRow.first.cells.entries) {
-      final map = a.value.data;
-      type = map?['type'];
-      final _yAxisMap = map?['yAxisMap'];
-      final xAxisMap = map?['xAxisMap'];
-      if(type=='table2'){
-        xAxisMapList.add(xAxisMap);
-      }
-      if(isFirst1) {
-        yAxisMap = _yAxisMap;
-      }
-      isFirst1 = false;
-
-      print("pluto cell data is ${a.value.data}");
-    }
+    // for (var a in sampleRow.first.cells.entries) {
+    //   final map = a.value.data;
+    //   type = map?['type'];
+    //   final _yAxisMap = map?['yAxisMap'];
+    //   final xAxisMap = map?['xAxisMap'];
+    //   if(type=='table2'){
+    //     xAxisMapList.add(xAxisMap);
+    //   }
+    //   if(isFirst1) {
+    //     yAxisMap = _yAxisMap;
+    //   }
+    //   isFirst1 = false;
+    //
+    //   print("pluto cell data is ${a.value.data}");
+    // }
 
     for (var e in sampleRow) {
       final map = e.cells.entries.first.value.data;
@@ -484,7 +487,7 @@ class PlutoRowGroupByColumnDelegate extends PlutoRowGroupDelegate {
       final _subkey3 = map?['subkey3'];
       final _subkey4 = map?['subkey4'];
 
-      type = map?['type'];
+      // type = map?['type'];
       final _yAxisMap = map?['yAxisMap'];
       final xAxisMap = map?['xAxisMap'];
       if(type=='table2'){
@@ -517,20 +520,79 @@ class PlutoRowGroupByColumnDelegate extends PlutoRowGroupDelegate {
       isFirst = false;
     }
 
+    var temp = {};
+    var i = 0;
+    for (var rows in sampleRow) {
+
+      var j = 0;
+      for(var cell in rows.cells.entries){ // it iterates all cells in a row
+        final key = cell.key;
+        final value = temp[key] ?? [];
+
+        var data = cell.value.data ?? {};
+
+        if(data!=null) {
+          data = {...data, 'count': cell.value.value};
+        }
+
+        value.add(data);
+
+        temp[key] = value;
+        j++;
+      }
+      i++;
+    }
+    var hashmapOfData = {};
+
+    var index = 0;
+    for(var listOfData in temp.values){ // it iterates all rows
+      final key = temp.keys.toList()[index];
+
+      var yAxisMap;
+      List<Map<dynamic, dynamic>> xAxisMapList=[];
+
+      for(var data in listOfData){ // it iterates all cells in a row
+        if(data!=null){
+          final _xAxisMap = data['xAxisMap'];
+          final _yAxisMap = data['yAxisMap'];
+
+          if(_yAxisMap!=null){
+            yAxisMap = _yAxisMap;
+          }
+
+          if(_xAxisMap!=null){
+            xAxisMapList.add(_xAxisMap);
+          }
+        }
+      }
+
+      var xAxisMap;
+      if(xAxisMapList.isNotEmpty){
+        xAxisMap = findCommonKeyValues(xAxisMapList);
+      }
+
+      hashmapOfData[key]={
+        'yAxisMap':yAxisMap,
+        'xAxisMap':xAxisMap
+      };
+
+      index++;
+    }
+
     for (var e in sampleRow.first.cells.entries) {
       cells[e.key] = PlutoCell(
-        value: visibleColumns.firstWhereOrNull((c) => c.field == e.key) != null
-            ? e.value.value
-            : null,
-        key: ValueKey('${groupKey}_${e.key}_cell'),
+          value: isNumberType(e.value)
+              ? hashmapOfData?[e.key]?['count'] ?? 0
+              : e.value.value,
+          key: ValueKey('${groupKey}_${e.key}_cell'),
           data: {
             'key': key,
             'subkey1': subkey1,
             'subkey2': subkey2,
             'subkey3': subkey3,
             'subkey4': subkey4,
-            'xAxisMap':e.value.data?['xAxisMap'],
-            'yAxisMap':e.value.data?['yAxisMap']
+            'xAxisMap':hashmapOfData[e.key]['xAxisMap'],
+            'yAxisMap':hashmapOfData[e.key]['yAxisMap']
           }  // edited here
       )
         ..setColumn(e.value.column)
