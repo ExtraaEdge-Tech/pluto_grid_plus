@@ -19,11 +19,8 @@ class PlutoAggregateHelper {
         ? rows.where((row) => filter(row.cells[column.field]!))
         : rows;
 
-    final Iterable<num> numbers = foundItems
-        .map(
-          (e) => e.cells[column.field]?.value as num?,
-        )
-        .whereNotNull();
+    final Iterable<num> numbers = foundItems.map(
+          (e) => e.cells[column.field]!.value);
 
     return numbers.isNotEmpty
         ? numberColumn.toNumber(numberColumn.applyFormat(numbers.sum))
@@ -46,11 +43,8 @@ class PlutoAggregateHelper {
         ? rows.where((row) => filter(row.cells[column.field]!))
         : rows;
 
-    final Iterable<num> numbers = foundItems
-        .map(
-          (e) => e.cells[column.field]?.value as num?,
-        )
-        .whereNotNull();
+    final Iterable<num> numbers = foundItems.map(
+          (e) => e.cells[column.field]!.value);
 
     return numbers.isNotEmpty
         ? numberColumn.toNumber(numberColumn.applyFormat(numbers.average))
