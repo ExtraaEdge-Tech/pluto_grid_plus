@@ -377,6 +377,12 @@ class _ColumnWidget extends StatelessWidget {
           height: height,
           child: DecoratedBox(
             decoration: BoxDecoration(
+              gradient: column.backgroundGradient, //
+              color: column.backgroundGradient == null
+                  ? (noDragTarget
+                      ? column.backgroundColor
+                      : style.dragTargetColumnColor)
+                  : null,
               border: BorderDirectional(
                 end: style.enableColumnBorderVertical
                     ? BorderSide(color: style.borderColor, width: 1.0)
