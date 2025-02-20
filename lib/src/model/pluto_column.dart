@@ -147,8 +147,6 @@ class PlutoColumn {
 
   /// A checkbox appears in the cell of the column.
   bool enableRowChecked;
-  int rowCheckBoxGroupDepth; //
-  bool enableTitleChecked;
 
   /// Sort rows by tapping on the column heading.
   bool enableSorting;
@@ -178,27 +176,6 @@ class PlutoColumn {
   /// Valid only when [enableContextMenu] is activated.
   bool enableFilterMenuItem;
 
-  ///Set hint text for filter field
-  String? filterHintText;
-
-  ///Set hint text color for filter field
-  Color? filterHintTextColor;
-
-  ///Set suffix icon for filter field
-  Icon? filterSuffixIcon;
-
-  ///Set custom widget
-  @Deprecated("Use new filterWidgetBuilder to provide some parameters")
-  Widget? filterWidget;
-
-  Widget Function(
-    FocusNode focusNode,
-    TextEditingController controller,
-    bool enabled,
-    void Function(String changed) handleOnChanged,
-    PlutoGridStateManager stateManager,
-  )? filterWidgetBuilder;
-
   /// Displays Hide column menu in the column context menu.
   /// Valid only when [enableContextMenu] is activated.
   bool enableHideColumnMenuItem;
@@ -214,8 +191,6 @@ class PlutoColumn {
 
   /// Hide the column.
   bool hide;
-
-  LinearGradient? backgroundGradient;
 
   PlutoColumn({
     required this.title,
@@ -242,24 +217,15 @@ class PlutoColumn {
     this.enableColumnDrag = true,
     this.enableRowDrag = false,
     this.enableRowChecked = false,
-    this.rowCheckBoxGroupDepth = 0,
-    this.enableTitleChecked = true,
     this.enableSorting = true,
     this.enableContextMenu = true,
     this.enableDropToResize = true,
     this.enableFilterMenuItem = true,
-    this.filterHintText,
-    this.filterHintTextColor,
-    this.filterSuffixIcon,
-    @Deprecated("Use new filterWidgetBuilder to provide some parameters")
-    this.filterWidget,
     this.enableHideColumnMenuItem = true,
     this.enableSetColumnsMenuItem = true,
     this.enableAutoEditing = false,
     this.enableEditingMode = true,
     this.hide = false,
-    this.backgroundGradient,
-    this.filterWidgetBuilder,
   })  : _key = UniqueKey(),
         _checkReadOnly = checkReadOnly;
 
